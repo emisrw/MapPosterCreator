@@ -1,39 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
 
-const styles = {
-  width: "100vw",
-  height: "calc(100vh - 80px)",
-  position: "absolute",
-};
-// mapboxgl.accessToken =
-//   "pk.eyJ1IjoiZW1pc3J3IiwiYSI6ImNrZm83YmpvdTJmb2gyeG52MTB2cnM4OTgifQ.0ZH8kkQWf-2MXp_BGJo7HA";
+import "./Map.css";
 
-const Map = () => {
-  const [map, setMap] = useState(null);
-  const mapContainer = useRef(null);
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
+// https://dev.to/laney/react-mapbox-beginner-tutorial-2e35
+const MapHooks = () => {
+  const mapContainerRef = useRef(null);
+
+  // initialize map when component mounts
   useEffect(() => {
-    mapboxgl.accessToken =
-      "pk.eyJ1IjoiZW1pc3J3IiwiYSI6ImNrZm83YmpvdTJmb2gyeG52MTB2cnM4OTgifQ.0ZH8kkQWf-2MXp_BGJo7HA";
-    const initializeMap = ({ setMap, mapContainer }) => {
-      const map = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: "mapbox://styles/mapbox/streets-v11", // stylesheet location
-        center: [0, 0],
-        zoom: 5,
-      });
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      // See style options here: https://docs.mapbox.com/api/maps/#styles
+      style: "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z",
+      center: [-104.9876, 39.7405],
+      zoom: 12.5,
+    });
 
-      map.on("load", () => {
-        setMap(map);
-        map.resize();
-      });
-    };
+    // add navigation control (the +/- zoom buttons)
+    map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
-    if (!map) initializeMap({ setMap, mapContainer });
-  }, [map]);
+    // clean up on unmount
+    return () => map.remove();
+  }, []);
 
-  return <div ref={(el) => (mapContainer.current = el)} style={styles} />;
+  return <div className="map-container" ref={mapContainerRef} />;
 };
-export default Map;
+
+export default MapHooks;
