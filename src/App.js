@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme) => ({
 
 function App() {
   const classes = useStyles();
-
   const [lng, setLng] = useState(-104.9876);
   const [lat, setLat] = useState(39.7405);
   const [zoom, setZoom] = useState(12);
@@ -30,11 +29,13 @@ function App() {
     <div className="App">
       <Grid container spacing={3}>
         <Grid className={classes.mapContainer} item xs={8}>
-          <MapHooks />
+          <MapHooks lng={lng} lat={lat} />
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
             <TextField
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
               variant="outlined"
               margin="normal"
               fullWidth
@@ -44,6 +45,8 @@ function App() {
               autoFocus
             />
             <TextField
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
               variant="outlined"
               margin="normal"
               fullWidth

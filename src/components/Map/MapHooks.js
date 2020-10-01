@@ -6,16 +6,17 @@ import "./Map.css";
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 // https://dev.to/laney/react-mapbox-beginner-tutorial-2e35
-const MapHooks = () => {
+const MapHooks = (props) => {
   const mapContainerRef = useRef(null);
 
   // initialize map when component mounts
   useEffect(() => {
+    console.log(props);
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       // See style options here: https://docs.mapbox.com/api/maps/#styles
       style: "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z",
-      center: [-104.9876, 39.7405],
+      center: [props.lng, props.lat],
       zoom: 12.5,
     });
 
