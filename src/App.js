@@ -5,6 +5,7 @@ import "./App.css";
 import MapHooks from "./components/Map/MapHooks";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -16,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
+    justifyContent: "center",
   },
 }));
 
@@ -29,41 +31,55 @@ function App() {
     <div className="App">
       <Grid container spacing={3}>
         <Grid className={classes.mapContainer} item xs={8}>
-          <MapHooks lng={lng} lat={lat} />
+          <MapHooks lng={lng} lat={lat} zoom={zoom} />
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
-            <TextField
-              value={lng}
-              onChange={(e) => setLng(e.target.value)}
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="lng"
-              label="Szerokość geograficzna"
-              name="lng"
-              autoFocus
-            />
-            <TextField
-              value={lat}
-              onChange={(e) => setLat(e.target.value)}
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="lat"
-              label="Długość geograficzna"
-              name="lat"
-              autoFocus
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="zoom"
-              label="Zoom"
-              name="zoom"
-              autoFocus
-            />
+            <form className={classes.form} noValidate>
+              <TextField
+                value={lng}
+                onChange={(e) => setLng(e.target.value)}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="lng"
+                label="Szerokość geograficzna"
+                name="lng"
+                autoFocus
+              />
+              <TextField
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="lat"
+                label="Długość geograficzna"
+                name="lat"
+                autoFocus
+              />
+              <TextField
+                value={zoom}
+                onChange={(e) => setZoom(e.target.value)}
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                id="zoom"
+                label="Zoom"
+                name="zoom"
+                autoFocus
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                color="primary"
+                className={classes.submit}
+              >
+                Aktualizuj
+              </Button>
+            </form>
           </div>
         </Grid>
       </Grid>

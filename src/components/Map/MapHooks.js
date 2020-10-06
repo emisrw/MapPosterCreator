@@ -17,7 +17,7 @@ const MapHooks = (props) => {
       // See style options here: https://docs.mapbox.com/api/maps/#styles
       style: "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z",
       center: [props.lng, props.lat],
-      zoom: 12.5,
+      zoom: props.zoom,
     });
 
     // add navigation control (the +/- zoom buttons)
@@ -25,7 +25,7 @@ const MapHooks = (props) => {
 
     // clean up on unmount
     return () => map.remove();
-  }, []);
+  }, [props]);
 
   return <div className="map-container" ref={mapContainerRef} />;
 };
