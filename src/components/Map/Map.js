@@ -4,8 +4,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import mapboxgl from "mapbox-gl";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
+import MapControls from "../MapControls.js/MapControls";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import { makeStyles } from "@material-ui/core/styles";
@@ -17,11 +16,12 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
   },
   paper: {
-    margin: theme.spacing(8, 4),
+    padding: theme.spacing(8, 4),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+    height: "100vh",
   },
 }));
 
@@ -36,7 +36,6 @@ function Map() {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      // See style options here: https://docs.mapbox.com/api/maps/#styles
       style: "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z",
       center: [lng, lat],
       zoom: zoom,
@@ -60,6 +59,12 @@ function Map() {
   const handleSubmit = (event, newValue) => {
     setZoom(newValue);
   };
+
+  const updateCoordinates = (coordinates) => {
+    console.log(coordinates);
+    setLng(coordinates.lng);
+    setLat(coordinates.lat);
+  };
   return (
     <React.Fragment>
       <CssBaseline />
@@ -70,39 +75,6 @@ function Map() {
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
-            <form className={classes.form} onSubmit={handleSubmit} noValidate>
-              <TextField
-                value={lng}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                id="lng"
-                label="Szerokość geograficzna"
-                name="lng"
-                autoFocus
-              />
-              <TextField
-                value={lat}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                id="lat"
-                label="Długość geograficzna"
-                name="lat"
-                autoFocus
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                color="primary"
-                className={classes.submit}
-              >
-                Aktualizuj
-              </Button>
-            </form>
             <Box component="span" m={3}>
               <Typography id="zoom-slider" gutterBottom>
                 Zoom level
@@ -118,6 +90,9 @@ function Map() {
                 marks
                 min={1}
                 max={12}
+              />
+              <MapControls
+                update={(coordinates) => updateCoordinates(coordinates)}
               />
             </Box>
           </div>
