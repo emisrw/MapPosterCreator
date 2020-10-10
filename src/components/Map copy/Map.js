@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Map.css";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import ReactMapGL from "react-map-gl";
-
+import mapboxgl from "mapbox-gl";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import MapControls from "../MapControls.js/MapControls";
@@ -10,11 +9,8 @@ import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import { makeStyles } from "@material-ui/core/styles";
 
-// http://visgl.github.io/react-map-gl/
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-//http://visgl.github.io/react-map-gl/
-const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-const MAPSTYLE = "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z";
 const useStyles = makeStyles((theme) => ({
   mapContainer: {
     position: "relative",
@@ -30,36 +26,40 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Map() {
+  const mapContainerRef = useRef(null);
   const classes = useStyles();
 
-  const [loaded, setLoaded] = useState(false);
-  const [viewport, setViewport] = useState({
-    width: "100%",
-    height: "100vh",
-    latitude: 39.7405,
-    longitude: -104.9876,
-    zoom: 12,
-  });
+  const [zoom, setZoom] = useState(12);
+  const [lng, setLng] = useState(-104.9876);
+  const [lat, setLat] = useState(39.7405);
 
-  const DRC_MAP = {
-    longitude: 23.656,
-    latitude: -2.88,
-    zoom: 4.3,
-  };
+  useEffect(() => {
+    let map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z",
+      center: [lng, lat],
+      zoom: zoom,
+    });
+
+    // add navigation control (the +/- zoom buttons)
+    map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+
+    map.on("move", () => {
+      setLng(map.getCenter().lng.toFixed(4));
+      setLat(map.getCenter().lat.toFixed(4));
+      setZoom(map.getZoom().toFixed(2));
+    });
+    // clean up on unmount
+    return () => map.remove();
+  }, [lng, lat, zoom]);
 
   const handleChange = (event, newValue) => {
-    setViewport((oldViewport) => ({
-      ...oldViewport,
-      zoom: newValue,
-    }));
+    setZoom(newValue);
   };
 
   const updateCoordinates = (coordinates) => {
-    console.log(coordinates);
-    setViewport((oldViewport) => ({
-      ...oldViewport,
-      ...coordinates,
-    }));
+    setLng(coordinates.lng);
+    setLat(coordinates.lat);
   };
   return (
     <React.Fragment>
@@ -67,23 +67,16 @@ function Map() {
 
       <Grid container spacing={0}>
         <Grid className={classes.mapContainer} item xs={8}>
-          <ReactMapGL
-            mapboxApiAccessToken={TOKEN}
-            mapStyle={MAPSTYLE}
-            onLoad={() => setLoaded(true)}
-            onViewportChange={(nextViewport) => setViewport(nextViewport)}
-            {...viewport}
-          />
+          <div className="map-container" ref={mapContainerRef} />
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
             <Box component="span" m={3}>
-              //TO DO SEARCH CITY
               <Typography id="zoom-slider" gutterBottom>
                 Zoom level
               </Typography>
               <Slider
-                defaultValue={12}
+                defaultValue={10}
                 // getAriaValueText={valuetext}
                 aria-labelledby="zoom-slider"
                 valueLabelDisplay="auto"
@@ -91,8 +84,8 @@ function Map() {
                 onChange={handleChange}
                 step={0.5}
                 marks
-                min={5}
-                max={14}
+                min={1}
+                max={12}
               />
               <MapControls
                 update={(coordinates) => updateCoordinates(coordinates)}

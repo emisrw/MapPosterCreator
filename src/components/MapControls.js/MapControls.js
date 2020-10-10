@@ -12,14 +12,14 @@ const useStyles = makeStyles((theme) => ({
 function MapControls(props) {
   const classes = useStyles();
 
-  const [lng, setLng] = useState(21.2593022);
-  const [lat, setLat] = useState(50.196359);
+  const [longitude, setLongitude] = useState(21.2593022);
+  const [latitude, setLatitude] = useState(50.196359);
 
   return (
     <div>
       <TextField
-        value={lng}
-        onChange={(e) => setLng(e.target.value)}
+        value={longitude}
+        onChange={(e) => setLongitude(e.target.value)}
         variant="outlined"
         margin="normal"
         fullWidth
@@ -29,8 +29,8 @@ function MapControls(props) {
         autoFocus
       />
       <TextField
-        value={lat}
-        onChange={(e) => setLat(e.target.value)}
+        value={latitude}
+        onChange={(e) => setLatitude(e.target.value)}
         variant="outlined"
         margin="normal"
         fullWidth
@@ -46,7 +46,7 @@ function MapControls(props) {
         variant="contained"
         size="large"
         color="primary"
-        onClick={() => props.update({ lng, lat })}
+        onClick={() => props.update({ longitude, latitude })}
         className={classes.submit}
       >
         Aktualizuj
