@@ -11,6 +11,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-map-gl": "^5.2.9",
+    "react-map-gl-geocoder": "^2.1.5",
+    "react-mapbox-gl-geocoder": "^1.1.0",
     "react-scripts": "3.4.3"
   },
   "scripts": {

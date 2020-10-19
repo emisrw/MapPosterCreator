@@ -1,13 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import "./Map.css";
+import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import ReactMapGL from "react-map-gl";
+import Geocoder from "react-map-gl-geocoder";
 
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import MapControls from "../MapControls.js/MapControls";
-import Typography from "@material-ui/core/Typography";
-import Slider from "@material-ui/core/Slider";
+
 import { makeStyles } from "@material-ui/core/styles";
 
 // http://visgl.github.io/react-map-gl/
@@ -41,18 +42,33 @@ function Map() {
     zoom: 12,
   });
 
-  const DRC_MAP = {
-    longitude: 23.656,
-    latitude: -2.88,
-    zoom: 4.3,
-  };
+  const geocoderContainerRef = useRef();
+  const mapRef = useRef();
 
-  const handleChange = (event, newValue) => {
+  const handleZoomChange = (zoomLevel) => {
     setViewport((oldViewport) => ({
       ...oldViewport,
-      zoom: newValue,
+      zoom: zoomLevel,
     }));
   };
+
+  const handleViewportChange = useCallback(
+    (newViewport) => setViewport(newViewport),
+    []
+  );
+
+  // if you are happy with Geocoder default settings, you can just use handleViewportChange directly
+  const handleGeocoderViewportChange = useCallback(
+    (newViewport) => {
+      const geocoderDefaultOverrides = { transitionDuration: 1000 };
+
+      return handleViewportChange({
+        ...newViewport,
+        ...geocoderDefaultOverrides,
+      });
+    },
+    [handleViewportChange]
+  );
 
   const updateCoordinates = (coordinates) => {
     console.log(coordinates);
@@ -62,46 +78,43 @@ function Map() {
     }));
   };
   return (
-    <React.Fragment>
-      <CssBaseline />
+    <>
+      {/* <CssBaseline /> */}
 
       <Grid container spacing={0}>
         <Grid className={classes.mapContainer} item xs={8}>
           <ReactMapGL
+            ref={mapRef}
             mapboxApiAccessToken={TOKEN}
             mapStyle={MAPSTYLE}
             onLoad={() => setLoaded(true)}
             onViewportChange={(nextViewport) => setViewport(nextViewport)}
             {...viewport}
-          />
+          >
+            <Geocoder
+              mapRef={mapRef}
+              containerRef={geocoderContainerRef}
+              onViewportChange={handleGeocoderViewportChange}
+              mapboxApiAccessToken={TOKEN}
+              marker={false}
+              placeholder={"Wpisz swoje miasto"}
+            />
+          </ReactMapGL>
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
             <Box component="span" m={3}>
-              //TO DO SEARCH CITY
-              <Typography id="zoom-slider" gutterBottom>
-                Zoom level
-              </Typography>
-              <Slider
-                defaultValue={12}
-                // getAriaValueText={valuetext}
-                aria-labelledby="zoom-slider"
-                valueLabelDisplay="auto"
-                // onChange={(e) => setZoom(e.target.value)}
-                onChange={handleChange}
-                step={0.5}
-                marks
-                min={5}
-                max={14}
-              />
+              <div ref={geocoderContainerRef} />
+
               <MapControls
+                zoomChange={(zoomLevel) => handleZoomChange(zoomLevel)}
                 update={(coordinates) => updateCoordinates(coordinates)}
               />
             </Box>
           </div>
         </Grid>
       </Grid>
-    </React.Fragment>
+    </>
   );
 }
 

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import Slider from "@material-ui/core/Slider";
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
@@ -9,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function MapControls(props) {
+function MapControls({ update, zoomChange }) {
   const classes = useStyles();
 
   const [longitude, setLongitude] = useState(21.2593022);
@@ -17,6 +19,22 @@ function MapControls(props) {
 
   return (
     <div>
+      <Typography id="zoom-slider" gutterBottom>
+        Zoom level
+      </Typography>
+      <Slider
+        defaultValue={12}
+        // getAriaValueText={valuetext}
+        aria-labelledby="zoom-slider"
+        valueLabelDisplay="auto"
+        // onChange={(e) => setZoom(e.target.value)}
+
+        onChange={(event, value) => zoomChange(value)}
+        step={0.5}
+        marks
+        min={5}
+        max={14}
+      />
       <TextField
         value={longitude}
         onChange={(e) => setLongitude(e.target.value)}
@@ -46,7 +64,7 @@ function MapControls(props) {
         variant="contained"
         size="large"
         color="primary"
-        onClick={() => props.update({ longitude, latitude })}
+        onClick={() => update({ longitude, latitude })}
         className={classes.submit}
       >
         Aktualizuj
