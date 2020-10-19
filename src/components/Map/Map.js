@@ -28,15 +28,18 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     height: "100vh",
   },
+  cityInput: {
+    "& .mapboxgl-ctrl-geocoder": {
+      width: "100%",
+    },
+  },
 }));
 
 function Map() {
   const classes = useStyles();
-
-  const [loaded, setLoaded] = useState(false);
   const [viewport, setViewport] = useState({
     width: "100%",
-    height: "100vh",
+    height: "100%",
     latitude: 39.7405,
     longitude: -104.9876,
     zoom: 12,
@@ -79,7 +82,7 @@ function Map() {
   };
   return (
     <>
-      {/* <CssBaseline /> */}
+      <CssBaseline />
 
       <Grid container spacing={0}>
         <Grid className={classes.mapContainer} item xs={8}>
@@ -87,7 +90,6 @@ function Map() {
             ref={mapRef}
             mapboxApiAccessToken={TOKEN}
             mapStyle={MAPSTYLE}
-            onLoad={() => setLoaded(true)}
             onViewportChange={(nextViewport) => setViewport(nextViewport)}
             {...viewport}
           >
@@ -103,14 +105,17 @@ function Map() {
         </Grid>
         <Grid item xs={4}>
           <div className={classes.paper}>
-            <Box component="span" m={3}>
-              <div ref={geocoderContainerRef} />
+            <Box
+              className={classes.cityInput}
+              ref={geocoderContainerRef}
+              component="div"
+              mb={3}
+            ></Box>
 
-              <MapControls
-                zoomChange={(zoomLevel) => handleZoomChange(zoomLevel)}
-                update={(coordinates) => updateCoordinates(coordinates)}
-              />
-            </Box>
+            <MapControls
+              zoomChange={(zoomLevel) => handleZoomChange(zoomLevel)}
+              update={(coordinates) => updateCoordinates(coordinates)}
+            />
           </div>
         </Grid>
       </Grid>
