@@ -8,7 +8,9 @@ import Geocoder from "react-map-gl-geocoder";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import MapControls from "../MapControls.js/MapControls";
-
+// import {saveAs} from 'file-saver'
+import { saveAs } from "file-saver";
+import "blueimp-canvas-to-blob/js/canvas-to-blob";
 import { makeStyles } from "@material-ui/core/styles";
 
 // http://visgl.github.io/react-map-gl/
@@ -73,6 +75,18 @@ function Map() {
     [handleViewportChange]
   );
 
+  const getMapboxCanvas = () => {
+    // let image = mapboxRef.getCanvas().toDataURL("image/png");
+    let map = mapRef.current.getMap();
+    // let blob = map.getCanvas().toDataURL("image/png").toBlob();
+
+    map.getCanvas().toBlob(function (blob) {
+      saveAs(blob, "map.png");
+    });
+
+    //  FileSaver.saveAs(blob, "hello world.txt");
+    // console.log(mapRef.getCanvas().toDataURL("image/png"));
+  };
   const updateCoordinates = (coordinates) => {
     console.log(coordinates);
     setViewport((oldViewport) => ({
@@ -88,6 +102,7 @@ function Map() {
         <Grid className={classes.mapContainer} item xs={8}>
           <ReactMapGL
             ref={mapRef}
+            preserveDrawingBuffer={true}
             mapboxApiAccessToken={TOKEN}
             mapStyle={MAPSTYLE}
             onViewportChange={(nextViewport) => setViewport(nextViewport)}
@@ -111,7 +126,7 @@ function Map() {
               component="div"
               mb={3}
             ></Box>
-
+            <button onClick={getMapboxCanvas}>Save map</button>
             <MapControls
               zoomChange={(zoomLevel) => handleZoomChange(zoomLevel)}
               update={(coordinates) => updateCoordinates(coordinates)}
