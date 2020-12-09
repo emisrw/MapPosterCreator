@@ -12,7 +12,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import NativeSelect from "@material-ui/core/Select";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -28,23 +28,32 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     minWidth: 120,
     width: "100%",
+    marginBottom: "15px",
   },
 }));
 
-function MapControls({ update, zoomChange }) {
+function MapControls({ updateCoordinates, zoomChange, updateFrameWidth }) {
   const classes = useStyles();
-
-  const [age, setAge] = React.useState("");
-
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
 
   const [longitude, setLongitude] = useState(21.2593022);
   const [latitude, setLatitude] = useState(50.196359);
+  const [size, setSize] = useState("A0");
 
+  const controls = [
+    { label: "A0", width: 840, height: 1180 },
+    { label: "A1", width: 594, height: 841 },
+    { label: "A2", width: 420, height: 594 },
+    { label: "A3", width: 297, height: 420 },
+  ];
+  const handleChange = (event) => {
+    setSize(event.target.value);
+    let result = controls.filter((size) => {
+      return size.label === event.target.value;
+    });
+    updateFrameWidth(...result);
+  };
   return (
-    <div>
+    <>
       <Typography id="zoom-slider" gutterBottom>
         Zoom level
       </Typography>
@@ -62,13 +71,33 @@ function MapControls({ update, zoomChange }) {
         max={14}
       />
 
+      <FormControl variant="outlined" className={classes.formControl}>
+        <InputLabel id="demo-simple-select-outlined-label">
+          Poster size
+        </InputLabel>
+        <NativeSelect
+          labelId="demo-simple-select-outlined-label"
+          id="demo-simple-select-outlined"
+          onChange={handleChange}
+          value={size}
+          defaultValue={"A0"}
+          label="Poster size"
+        >
+          {controls.map((ctrl) => (
+            <MenuItem value={ctrl.label} key={ctrl.label}>
+              {ctrl.label} - {ctrl.width}mm x {ctrl.height} mm
+            </MenuItem>
+          ))}
+        </NativeSelect>
+      </FormControl>
+
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography className={classes.heading}>Insert lat & lng</Typography>
+          <Typography className={classes.heading}>Custom lat & lng</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <div className={classes.form}>
@@ -101,7 +130,7 @@ function MapControls({ update, zoomChange }) {
               variant="contained"
               size="large"
               color="primary"
-              onClick={() => update({ longitude, latitude })}
+              onClick={() => updateCoordinates({ longitude, latitude })}
               className={classes.submit}
             >
               Aktualizuj
@@ -109,27 +138,7 @@ function MapControls({ update, zoomChange }) {
           </div>
         </AccordionDetails>
       </Accordion>
-
-      <FormControl variant="outlined" className={classes.formControl}>
-        <InputLabel id="demo-simple-select-outlined-label">
-          Poster size
-        </InputLabel>
-        <Select
-          labelId="demo-simple-select-outlined-label"
-          id="demo-simple-select-outlined"
-          value={age}
-          onChange={handleChange}
-          label="Age"
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
-        </Select>
-      </FormControl>
-    </div>
+    </>
   );
 }
 

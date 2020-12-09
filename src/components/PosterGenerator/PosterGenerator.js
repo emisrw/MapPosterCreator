@@ -2,9 +2,13 @@ import React from "react";
 import { saveAs } from "file-saver";
 import "blueimp-canvas-to-blob/js/canvas-to-blob";
 import ReactMapGL from "react-map-gl";
+const TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+const MAPSTYLE = "mapbox://styles/emisrw/ckfobfyge018m19rujt5g5k0z";
 
 // komponent bedzie przyjmowal szerokosc i wysokosc w mm
-const PosterGenerator = ({ width, height }) => {
+const PosterGenerator = () => {
+  const mapRef = useRef();
+
   function toPixels(length) {
     "use strict";
 
@@ -20,21 +24,11 @@ const PosterGenerator = ({ width, height }) => {
     return conversionFactor * length + "px";
   }
 
-  const createFakeMapContainer = () => {
-    // Create map container
-    var hidden = document.createElement("div");
-    hidden.className = "hidden-map";
-    document.body.appendChild(hidden);
-    var container = document.createElement("div");
-    container.style.width = toPixels(width);
-    container.style.height = toPixels(height);
-    hidden.appendChild(container);
-  };
+  // 1. Trzeba wygenerowac nowa mape - czy musze ja pokazywac ?
 
   const saveToFile = () => {
-    // let image = mapboxRef.getCanvas().toDataURL("image/png");
-    // let map = mapRef.current.getMap();
-    // // let blob = map.getCanvas().toDataURL("image/png").toBlob();
+    let map = mapRef.current.getMap();
+    let blob = map.getCanvas().toDataURL("image/png").toBlob();
     // map.getCanvas().toBlob(function (blob) {
     //   saveAs(blob, "map.png");
     // });
@@ -42,7 +36,17 @@ const PosterGenerator = ({ width, height }) => {
     // console.log(mapRef.getCanvas().toDataURL("image/png"));
   };
 
-  return <div></div>;
+  return (
+    <div>
+      <ReactMapGL
+        ref={mapRef}
+        preserveDrawingBuffer={true}
+        mapboxApiAccessToken={TOKEN}
+        mapStyle={MAPSTYLE}
+        {...props}
+      ></ReactMapGL>
+    </div>
+  );
 };
 
 export default PosterGenerator;
