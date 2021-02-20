@@ -1,75 +1,138 @@
-import React, { useState } from "react";
-import TextField from "@material-ui/core/TextField";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
-import Accordion from "@material-ui/core/Accordion";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Typography from "@material-ui/core/Typography";
-import Slider from "@material-ui/core/Slider";
+import SaveIcon from "@material-ui/icons/Save";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import NativeSelect from "@material-ui/core/Select";
+import { useStyles } from "./MapControls.style";
+import Paper from "@material-ui/core/Paper";
+import InputBase from "@material-ui/core/InputBase";
+import IconButton from "@material-ui/core/IconButton";
+import SettingsIcon from "@material-ui/icons/Settings";
 
-import { makeStyles } from "@material-ui/core/styles";
+import Popper from "@material-ui/core/Popper";
+import Typography from "@material-ui/core/Typography";
+import Fade from "@material-ui/core/Fade";
+import { postersSizes } from "../../constants/Sizes";
+import { styles } from "../../constants/Styles";
+import { Slider } from "../Slider/Slider";
 
-const useStyles = makeStyles((theme) => ({
-  mapContainer: {
-    position: "relative",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  formControl: {
-    marginTop: theme.spacing(1),
-    minWidth: 120,
-    width: "100%",
-    marginBottom: "15px",
-  },
-}));
-
-function MapControls({ updateCoordinates, zoomChange, updateFrameWidth }) {
+function MapControls({ setLabels, setMapStyle, updateFrameWidth }) {
   const classes = useStyles();
 
-  const [longitude, setLongitude] = useState(21.2593022);
-  const [latitude, setLatitude] = useState(50.196359);
+  // const [longitude, setLongitude] = useState(21.2593022);
+  // const [latitude, setLatitude] = useState(50.196359);
   const [size, setSize] = useState("A0");
+  const [title, setTitle] = useState("Kraków");
+  const [subtitle, setSubtitle] = useState("Twoje nowe miejsce");
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [placement, setPlacement] = React.useState();
+  const [currentStyleActive, setCurrentStyleActive] = useState("style1");
+  // Set first array size on init
+  useEffect(() => {
+    updateFrameWidth(postersSizes[0]);
+  }, []);
 
-  const controls = [
-    { label: "A0", width: 840, height: 1180 },
-    { label: "A1", width: 594, height: 841 },
-    { label: "A2", width: 420, height: 594 },
-    { label: "A3", width: 297, height: 420 },
-  ];
-  const handleChange = (event) => {
+  // Update labels on change
+  useEffect(() => {
+    setLabels({ title, subtitle, bg: "#fff" });
+  }, [title, subtitle]);
+
+  const handleClickSettings = (newPlacement) => (event) => {
+    setAnchorEl(event.currentTarget);
+    setOpen((prev) => placement !== newPlacement || !prev);
+    setPlacement(newPlacement);
+  };
+
+  const handleTitleChange = (event) => {
+    setTitle(event.target.value);
+  };
+  const handleSubtitleChange = (event) => {
+    setSubtitle(event.target.value);
+  };
+  const handleStyleChange = (item) => {
+    console.log(item);
+    if (currentStyleActive != item.id) {
+      setMapStyle(item.url);
+      setCurrentStyleActive(item.id);
+    }
+  };
+  const handleSizeChange = (event) => {
     setSize(event.target.value);
-    let result = controls.filter((size) => {
+    let result = postersSizes.filter((size) => {
       return size.label === event.target.value;
     });
     updateFrameWidth(...result);
   };
   return (
     <>
-      <Typography id="zoom-slider" gutterBottom>
-        Zoom level
-      </Typography>
-      <Slider
-        defaultValue={12}
-        // getAriaValueText={valuetext}
-        aria-labelledby="zoom-slider"
-        valueLabelDisplay="auto"
-        // onChange={(e) => setZoom(e.target.value)}
+      <Popper
+        className={classes.popper}
+        open={open}
+        anchorEl={anchorEl}
+        placement="left"
+        transition
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <Paper>
+              <Typography className={classes.typography}>
+                The content of the Popper. The content of the Popper. The
+                content of the Popper. The content of the Popper.The content of
+                the Popper.The content of the Popper.
+              </Typography>
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
 
-        onChange={(event, value) => zoomChange(value)}
-        step={0.5}
-        marks
-        min={5}
-        max={14}
-      />
+      <div className={classes.slider}>
+        <Slider
+          styles={styles}
+          tag="section"
+          wrapperTag="ul"
+          currentStyleActive={currentStyleActive}
+          handleStyleChange={handleStyleChange}
+        />
+      </div>
+      <Paper className={classes.root}>
+        <InputBase
+          className={classes.input}
+          placeholder="Kraków"
+          value={title}
+          onChange={handleTitleChange}
+          inputProps={{ "aria-label": "search google maps" }}
+        />
+
+        <IconButton
+          color="primary"
+          className={classes.iconButton}
+          aria-label="directions"
+          onClick={handleClickSettings("left")}
+        >
+          <SettingsIcon />
+        </IconButton>
+      </Paper>
+
+      <Paper className={classes.root}>
+        <InputBase
+          className={classes.input}
+          value={subtitle}
+          onChange={handleSubtitleChange}
+          inputProps={{ "aria-label": "search google maps" }}
+        />
+
+        <IconButton
+          color="primary"
+          className={classes.iconButton}
+          aria-label="directions"
+          onClick={handleClickSettings("left")}
+        >
+          <SettingsIcon />
+        </IconButton>
+      </Paper>
 
       <FormControl variant="outlined" className={classes.formControl}>
         <InputLabel id="demo-simple-select-outlined-label">
@@ -78,66 +141,27 @@ function MapControls({ updateCoordinates, zoomChange, updateFrameWidth }) {
         <NativeSelect
           labelId="demo-simple-select-outlined-label"
           id="demo-simple-select-outlined"
-          onChange={handleChange}
+          onChange={handleSizeChange}
           value={size}
           defaultValue={"A0"}
           label="Poster size"
         >
-          {controls.map((ctrl) => (
+          {postersSizes.map((ctrl) => (
             <MenuItem value={ctrl.label} key={ctrl.label}>
               {ctrl.label} - {ctrl.width}mm x {ctrl.height} mm
             </MenuItem>
           ))}
         </NativeSelect>
       </FormControl>
-
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography className={classes.heading}>Custom lat & lng</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div className={classes.form}>
-            <TextField
-              value={longitude}
-              onChange={(e) => setLongitude(e.target.value)}
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="lng"
-              label="Szerokość geograficzna"
-              name="lng"
-              autoFocus
-            />
-            <TextField
-              value={latitude}
-              onChange={(e) => setLatitude(e.target.value)}
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              id="lat"
-              label="Długość geograficzna"
-              name="lat"
-              autoFocus
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              color="primary"
-              onClick={() => updateCoordinates({ longitude, latitude })}
-              className={classes.submit}
-            >
-              Aktualizuj
-            </Button>
-          </div>
-        </AccordionDetails>
-      </Accordion>
+      <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        className={classes.button}
+        startIcon={<SaveIcon />}
+      >
+        Generate map
+      </Button>
     </>
   );
 }
