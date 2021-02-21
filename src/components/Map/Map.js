@@ -8,6 +8,7 @@ import Geocoder from "react-map-gl-geocoder";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import MapControls from "../MapControls.js/MapControls";
+import MapStepper from "../MapStepper/MapStepper";
 import { Label } from "../Label/Label";
 import { useStyles } from "./Map.style";
 
@@ -25,6 +26,7 @@ function Map() {
     padding: 20,
     zoom: 12,
   });
+
   const [frameWidth, setframeWidth] = useState("100%");
   const [mapStyle, setMapStyle] = useState(MAPSTYLE);
   const [labels, setLabels] = useState({
@@ -35,13 +37,6 @@ function Map() {
 
   const geocoderContainerRef = useRef();
   const mapRef = useRef();
-
-  // const handleZoomChange = (zoomLevel) => {
-  //   setViewport((oldViewport) => ({
-  //     ...oldViewport,
-  //     zoom: zoomLevel,
-  //   }));
-  // };
 
   const handleViewportChange = useCallback(
     (newViewport) => setViewport(newViewport),
@@ -60,6 +55,7 @@ function Map() {
     },
     [handleViewportChange]
   );
+
   const updateFrameWidth = (result) => {
     const mapWrapper = document.getElementById("mapWrapper");
     const width = mapWrapper.clientWidth;
@@ -80,12 +76,16 @@ function Map() {
     }));
   };
 
+  function StepOne(props) {
+    return <div ref={geocoderContainerRef}>{props.children}</div>;
+  }
+
   return (
     <>
       <CssBaseline />
 
       <Grid container spacing={0}>
-        <Grid className={classes.mapContainer} item xs={8}>
+        <Grid className={classes.mapContainer} item xs={12} sm={8}>
           <div
             id="mapWrapper"
             className={classes.mapFrame}
@@ -114,25 +114,10 @@ function Map() {
             </ReactMapGL>
           </div>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={12} sm={4}>
           <div className={classes.paper}>
-            <Box
-              className={classes.cityInput}
-              ref={geocoderContainerRef}
-              component="div"
-              mb={3}
-            ></Box>
-
-            <MapControls
-              // zoomChange={(zoomLevel) => handleZoomChange(zoomLevel)}
-              updateCoordinates={(coordinates) =>
-                updateCoordinates(coordinates)
-              }
-              setLabels={setLabels}
-              setMapStyle={setMapStyle}
-              updateFrameWidth={(posterSizes) => updateFrameWidth(posterSizes)}
-            />
-            {/* <button onClick={getMapboxCanvas}>Save map</button> */}
+            <StepOne></StepOne>
+            <MapStepper></MapStepper>
           </div>
         </Grid>
       </Grid>

@@ -10,14 +10,14 @@ export const useStyles = makeStyles((theme) => ({
   },
   mapFrame: {
     position: "relative",
-    border: "1px solid #000",
+    background: "#ccc",
     height: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
   },
   paper: {
-    padding: theme.spacing(8, 4),
+    // padding: theme.spacing(8, 4),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
